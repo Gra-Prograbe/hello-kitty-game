@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hello Kitty Game</title>
+    <style>
+        body {
+            text-align: center;
+            font-family: Arial, sans-serif;
+            background-color: #f0f8ff;
+        }
+
+        canvas {
+            border: 1px solid #d3d3d3;
+            background-color: #f0f0f0;
+        }
+    </style>
+</head>
+<body>
+    <h1>Hello Kitty Game</h1>
+    <canvas id="gameCanvas" width="800" height="600"></canvas>
+    <script>
+        const canvas = document.getElementById("gameCanvas");
+        const ctx = canvas.getContext("2d");
+
+        let kittyX = canvas.width / 2;
+        let kittyY = canvas.height - 30;
+        let rightPressed = false;
+        let leftPressed = false;
+        let stars = [];
+        let score = 0;
+
+        document.addEventListener("keydown", keyDownHandler, false);
+        document.addEventListener("keyup", keyUpHandler, false);
+
+        function keyDownHandler(e) {
+            if(e.key === "Right" || e.key === "ArrowRight") {
+                rightPressed = true;
+            } else if(e.key === "Left" || e.key === "ArrowLeft") {
+                leftPressed = true;
+            }
+        }
+
+        function keyUpHandler(e) {
+            if(e.key === "Right" || e.key === "ArrowRight") {
+                rightPressed = false;
+            } else if(e.key === "Left" || e.key === "ArrowLeft") {
+                leftPressed = false;
+            }
+        }
+
+        function drawKitty() {
+            let kittyImage = new Image();
+            kittyImage.src = 'https://w7.pngwing.com/pngs/787/162/png-transparent-hello-kitty-hello-kitty-cartoon-desktop-wallpaper-character-thumbnail.png'; // Reemplaza esto con una URL válida de imagen de Hello Kitty
+            ctx.drawImage(kittyImage, kittyX, kittyY, 50, 50);
+        }
+
+        function drawStars() {
+            for(let i = 0; i < stars.length; i++) {
+                let star = stars[i];
+                ctx.beginPath();
+                ctx.arc(star.x, star.y, star.radius, 0, Math.PI*2);
+                ctx.fillStyle = "#FFD700";
+                ctx.fill();
+                ctx.closePath();
+                star.y += 2;
+
+                if(star.y > canvas.height) {
+                    stars.splice(i, 1);
+                }
+
+                if(star.y > kittyY && star.y < kittyY + 50 && star.x > kittyX && star.x < kittyX + 50) {
+                    stars.splice(i, 1);
+                    score++;
+                }
+            }
+        }
+
+        function drawScore() {
+            ctx.font = "16px Arial";
+            ctx.fillStyle = "#0095DD";
+            ctx.fillText("Score: " + score, 8, 20);
+        }
+
+        function generateStars() {
+            if(Math.random() < 0.02) {
+                let starX = Math.random() * canvas.width;
+                stars.push({ x: starX, y: 0, radius: 5 });
+            }
+        }
+
+        function draw() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            drawKitty();
+            drawStars();
+            drawScore();
+            generateStars();
+
+            if(rightPressed && kittyX < canvas.width - 50) {
+                kittyX += 5;
+            } else if(leftPressed && kittyX > 0) {
+                kittyX -= 5;
+            }
+
+            requestAnimationFrame(draw);
+        }
+
+        draw();
+    </script>
+</body>
+</html>
